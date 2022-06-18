@@ -1,0 +1,21 @@
+service: print-stocks-serverless
+
+frameworkVersion: "2"
+
+plugins:
+  - serverless-plugin-typescript
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+  lambdaHashingVersion: "20201221"
+
+functions:
+  hello:
+    handler: hello.handler
+    events:
+      - http:
+          path: /
+          method: get
