@@ -2,8 +2,7 @@ service: print-stocks-serverless
 
 frameworkVersion: "2"
 
-plugins:
-  - serverless-plugin-typescript
+useDotenv: true
 
 provider:
   name: aws
@@ -11,11 +10,13 @@ provider:
   region: us-east-1
   stage: ${opt:stage, 'dev'}
   lambdaHashingVersion: "20201221"
+  environment:
+    STOCKS: ${env:STOCKS}
 
 functions:
-  hello:
-    handler: hello.handler
-    events:
-      - http:
-          path: /
-          method: get
+  printStocks:
+    handler: dist/handlers/printStocks.handler
+    memorySize: 2048
+    timeout: 15
+    layers:
+      - arn:aws:lambda:${aws:region}:764866452798:layer:chrome-aws-lambda:31
