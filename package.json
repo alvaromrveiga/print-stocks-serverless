@@ -4,16 +4,17 @@
   "description": "",
   "main": "handler.js",
   "scripts": {
+    "deploy": "tsc && sls deploy",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "serverless-plugin-typescript": "^2.1.2",
     "typescript": "^4.7.4"
   },
-  "overrides": {
-    "serverless": "^2.x"
+  "dependencies": {
+    "chrome-aws-lambda": "^10.1.0",
+    "puppeteer-core": "^10.4.0"
   }
 }
