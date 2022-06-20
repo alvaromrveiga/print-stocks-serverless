@@ -1,5 +1,8 @@
+import { S3 } from "aws-sdk";
 import { ElementHandle, Page } from "puppeteer-core";
 import { defaultTimeout, getBrowser, stocksArray } from "../config";
+
+const s3 = new S3();
 
 async function printStocks() {
   const browser = await getBrowser();
@@ -26,9 +29,7 @@ async function printStocks() {
 
     await waitStockChartLoad(page, stockDescriptionText);
 
-    console.log(stockDescriptionText);
-
-    // await screenshotChart(page);
+    await saveChartScreenshot(page, stocksArray[i]);
   }
 
   await browser.close();
@@ -160,7 +161,7 @@ async function waitStockChartLoad(
   }
 }
 
-async function screenshotChart(page: Page): Promise<void> {
+async function saveChartScreenshot(page: Page, stock: string): Promise<void> {
   try {
     await moveMouseOutsideScreenshotView(page);
 
@@ -169,9 +170,9 @@ async function screenshotChart(page: Page): Promise<void> {
       { timeout: defaultTimeout }
     );
 
-    await chartTable?.screenshot({
-      path: "tmp/example" + new Date().toISOString() + ".png",
-    });
+    const buffer = (await chartTable?.screenshot()) as Buffer;
+
+    await saveScreenshot(buffer, stock);
   } catch (error) {
     throw new Error(`Error taking a screenshot of the chart: ` + error);
   }
@@ -184,6 +185,32 @@ async function moveMouseOutsideScreenshotView(page: Page) {
     throw new Error(
       `Error moving the mouse outside the screenshot view: ` + error
     );
+  }
+}
+
+async function saveScreenshot(buffer: Buffer, stock: string): Promise<void> {
+  try {
+    const now = new Date()
+      .toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      })
+      .replace(/\//g, "-");
+
+    await s3
+      .putObject({
+        Bucket: process.env.BUCKET_NAME!,
+        Key: `${stock}-${now}.png`,
+        Body: buffer,
+        ContentType: "image/png",
+      })
+      .promise();
+  } catch (error) {
+    throw new Error(`Error saving screenshot in AWS S3: ` + error);
   }
 }
 
