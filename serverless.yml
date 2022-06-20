@@ -29,7 +29,7 @@ functions:
   printStocks:
     handler: dist/handlers/printStocks.handler
     memorySize: 2048
-    timeout: 15
+    timeout: 30
     layers:
       - arn:aws:lambda:${aws:region}:764866452798:layer:chrome-aws-lambda:31
     events:
