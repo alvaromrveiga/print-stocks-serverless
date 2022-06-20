@@ -245,7 +245,7 @@ async function sendMail(stockChartScreenshots: Stock[]) {
       (accumulator, stock) => {
         accumulator += `<h2>${stock.name.toUpperCase()}:</h2> <img src="${
           stock.url
-        }" alt="${stock.url}"/><br>`;
+        }"/><br>`;
         return accumulator;
       },
       ""
