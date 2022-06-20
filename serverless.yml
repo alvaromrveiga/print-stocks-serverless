@@ -13,11 +13,17 @@ provider:
   environment:
     STOCKS: ${env:STOCKS}
     BUCKET_NAME: ${self:custom.StockChartsBucket.name}
+    SENDER_EMAIL: ${env:SENDER_EMAIL}
+    RECEIVER_EMAIL: ${env:RECEIVER_EMAIL}
   iamRoleStatements:
     - Effect: Allow
       Action:
         - s3:PutObject
       Resource: arn:aws:s3:::${self:custom.StockChartsBucket.name}/*
+    - Effect: Allow
+      Action:
+        - ses:SendEmail
+      Resource: arn:aws:ses:*
 
 functions:
   printStocks:
