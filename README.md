@@ -1,119 +1,59 @@
-<!--
-title: 'AWS Simple HTTP Endpoint example in NodeJS'
-description: 'This template demonstrates how to make a simple REST API with Node.js running on AWS Lambda and API Gateway using the traditional Serverless Framework.'
-layout: Doc
-framework: v2
-platform: AWS
-language: nodeJS
-priority: 1
-authorLink: 'https://github.com/serverless'
-authorName: 'Serverless, inc.'
-authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4'
--->
+<h1 align="center">Print Stocks Serverless</h1>
+<p align="center">Receba os gráficos dos seus ativos preferidos disponiveis no <a href="https://tradingview.com">TradingView</a> por e-mail</p>
 
-# Serverless Framework Node REST API on AWS
+<p align="center">
+  <img src="https://img.shields.io/badge/Amazon_AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white"/>
+  <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Puppeteer-40B5A4?style=for-the-badge&logo=Puppeteer&logoColor=white"/>
+</p>
 
-This template demonstrates how to make a simple REST API with Node.js running on AWS Lambda and API Gateway using the traditional Serverless Framework.
+## 📑 Índice
+<!--ts-->
+   * [📚 Exemplo](#-exemplo)
+   * [🔧 Instalação](#-instalação)
+   * [💻 Tecnologias](#-tecnologias)
+<!--te-->
 
-This template does not include any kind of persistence (database). For a more advanced examples check out the [examples repo](https://github.com/serverless/examples/) which includes Typescript, Mongo, DynamoDB and other examples.
+## 📚 Exemplo
 
-## Usage
+## 🔧 Instalação
 
-### Deployment
+1. Você precisará do [Node.js](https://nodejs.org/) instalado e uma conta na [AWS](https://aws.amazon.com/pt/). O nível gratuito é suficiente.
 
-This example is made to work with the Serverless Framework dashboard which includes advanced features like CI/CD, monitoring, metrics, etc.
+1. Instale e configure o [AWS CLI](https://aws.amazon.com/pt/cli/).
 
-```
-$ serverless login
-$ serverless deploy
-```
-
-To deploy without the dashboard you will need to remove `org` and `app` fields from the `serverless.yml`, and you won’t have to run `sls login` before deploying.
-
-After running deploy, you should see output similar to:
-
+1. Instale o [Serverless](https://www.serverless.com/) globalmente:
 ```bash
-Serverless: Packaging service...
-Serverless: Excluding development dependencies...
-Serverless: Creating Stack...
-Serverless: Checking Stack create progress...
-........
-Serverless: Stack create finished...
-Serverless: Uploading CloudFormation file to S3...
-Serverless: Uploading artifacts...
-Serverless: Uploading service aws-node-rest-api.zip file to S3 (711.23 KB)...
-Serverless: Validating template...
-Serverless: Updating Stack...
-Serverless: Checking Stack update progress...
-.................................
-Serverless: Stack update finished...
-Service Information
-service: aws-node-rest-api
-stage: dev
-region: us-east-1
-stack: aws-node-rest-api-dev
-resources: 12
-api keys:
-  None
-endpoints:
-  ANY - https://xxxxxxx.execute-api.us-east-1.amazonaws.com/dev/
-functions:
-  api: aws-node-rest-api-dev-hello
-layers:
-  None
+  npm i -g serverless
 ```
 
-_Note_: In current form, after deployment, your API is public and can be invoked by anyone. For production deployments, you might want to configure an authorizer. For details on how to do that, refer to [http event docs](https://www.serverless.com/framework/docs/providers/aws/events/apigateway/).
-
-### Invocation
-
-After successful deployment, you can call the created application via HTTP:
-
+3. Clone o projeto:
 ```bash
-curl https://xxxxxxx.execute-api.us-east-1.amazonaws.com/dev/
+  git clone https://github.com/alvaromrveiga/print-stocks-serverless
 ```
 
-Which should result in response similar to the following (removed `input` content for brevity):
-
-```json
-{
-  "message": "Go Serverless v2.0! Your function executed successfully!",
-  "input": {
-    ...
-  }
-}
-```
-
-### Local development
-
-You can invoke your function locally by using the following command:
-
+4. Entre na pasta e instale as dependências:
 ```bash
-serverless invoke local --function hello
+  cd print-stocks-serverless
+
+  npm i
 ```
 
-Which should result in response similar to the following:
-
-```
-{
-  "statusCode": 200,
-  "body": "{\n  \"message\": \"Go Serverless v2.0! Your function executed successfully!\",\n  \"input\": \"\"\n}"
-}
-```
-
-
-Alternatively, it is also possible to emulate API Gateway and Lambda locally by using `serverless-offline` plugin. In order to do that, execute the following command:
-
+5. Faça o deploy para a AWS:
 ```bash
-serverless plugin install -n serverless-offline
+  sls deploy
 ```
 
-It will add the `serverless-offline` plugin to `devDependencies` in `package.json` file as well as will add it to `plugins` in `serverless.yml`.
-
-After installation, you can start local emulation with:
-
-```
-serverless offline
+6. Se quiser invocar a função antes do horário programado:
+```bash
+  # Por padrão a função é executada 18h30 no horário de Brasília
+  sls invoke -f printStocks -l
 ```
 
-To learn more about the capabilities of `serverless-offline`, please refer to its [GitHub repository](https://github.com/dherault/serverless-offline).
+## 💻 Tecnologias
+- [Node.js](https://nodejs.org/en/) e [Typescript](https://www.typescriptlang.org/)
+- [Puppeteer](https://github.com/puppeteer/puppeteer) - Automatizar ações no Chromium
+- [chrome-aws-lambda](https://github.com/alixaxel/chrome-aws-lambda) - Binário do Chromium compactado para AWS Lambdas
+- [chrome-aws-lambda-layer](https://github.com/shelfio/chrome-aws-lambda-layer) - Lambda layer com o chrome-aws-lambda
+- [aws-sdk](https://github.com/aws/aws-sdk-js) - Funções dos serviços SES e S3
