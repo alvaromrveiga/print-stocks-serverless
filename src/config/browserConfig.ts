@@ -7,8 +7,8 @@ import {
 } from "puppeteer-core";
 
 const windowSize: Viewport = {
-  width: 1366,
-  height: 768,
+  width: 900,
+  height: 506,
 };
 
 const browserConfig: LaunchOptions &
