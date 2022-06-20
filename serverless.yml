@@ -20,3 +20,32 @@ functions:
     timeout: 15
     layers:
       - arn:aws:lambda:${aws:region}:764866452798:layer:chrome-aws-lambda:31
+
+resources:
+  Resources:
+    StockChartsBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.StockChartsBucket.name}
+        LifecycleConfiguration:
+          Rules:
+            - Id: ExpireCharts
+              Status: Enabled
+              ExpirationInDays: 7
+
+    StockChartsBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: !Ref StockChartsBucket
+        PolicyDocument:
+          Statement:
+            - Sid: PublicRead
+              Effect: Allow
+              Principal: "*"
+              Action:
+                - s3:GetObject
+              Resource: arn:aws:s3:::${self:custom.StockChartsBucket.name}/*
+
+custom:
+  StockChartsBucket:
+    name: stock-charts-bucket-veiga-${self:provider.stage}
