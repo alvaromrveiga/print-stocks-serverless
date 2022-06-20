@@ -55,7 +55,7 @@
   <h4>Exemplo de e-mail recebido:</h4>
   <img src="https://github.com/alvaromrveiga/print-stocks-serverless/blob/main/assets/emailStocks.png"/>
   
-  <h4>Execução em modo headfull para mostrar os passos:</h4>https://github.com/alvaromrveiga/print-stocks-serverless/blob/main/assets/headfull.gif
+  <h4>Execução em modo headfull para mostrar os passos:</h4>
   <img src="https://github.com/alvaromrveiga/print-stocks-serverless/blob/main/assets/headfull.gif"/>
 </p>
 
