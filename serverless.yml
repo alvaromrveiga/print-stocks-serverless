@@ -12,6 +12,12 @@ provider:
   lambdaHashingVersion: "20201221"
   environment:
     STOCKS: ${env:STOCKS}
+    BUCKET_NAME: ${self:custom.StockChartsBucket.name}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+      Resource: arn:aws:s3:::${self:custom.StockChartsBucket.name}/*
 
 functions:
   printStocks:
@@ -32,7 +38,6 @@ resources:
             - Id: ExpireCharts
               Status: Enabled
               ExpirationInDays: 7
-
     StockChartsBucketPolicy:
       Type: AWS::S3::BucketPolicy
       Properties:
