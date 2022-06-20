@@ -32,6 +32,9 @@ functions:
     timeout: 15
     layers:
       - arn:aws:lambda:${aws:region}:764866452798:layer:chrome-aws-lambda:31
+    events:
+      - schedule: cron(30 21 ? * MON-FRI *)
+      # UTF 0 time
 
 resources:
   Resources:
