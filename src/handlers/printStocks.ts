@@ -1,8 +1,11 @@
-import { S3 } from "aws-sdk";
+import { S3, SES } from "aws-sdk";
+import { SendEmailRequest } from "aws-sdk/clients/ses";
 import { ElementHandle, Page } from "puppeteer-core";
 import { defaultTimeout, getBrowser, stocksArray } from "../config";
+import { Stock } from "../entities/Stock";
 
 const s3 = new S3();
+const ses = new SES();
 
 async function printStocks() {
   const browser = await getBrowser();
@@ -15,6 +18,8 @@ async function printStocks() {
   await changeToLogView(page);
 
   await closeSideTab(page);
+
+  let stockChartScreenshots: Stock[] = [];
 
   for (let i = 0; i < stocksArray.length; i++) {
     await openStockSearch(page);
@@ -29,10 +34,15 @@ async function printStocks() {
 
     await waitStockChartLoad(page, stockDescriptionText);
 
-    await saveChartScreenshot(page, stocksArray[i]);
+    const screenshotUrl = await saveChartScreenshot(page, stocksArray[i]);
+
+    const stock = new Stock(stocksArray[i], screenshotUrl);
+    stockChartScreenshots.push(stock);
   }
 
   await browser.close();
+
+  await sendMail(stockChartScreenshots);
 }
 
 async function waitPageLoad(page: Page): Promise<void> {
@@ -161,7 +171,7 @@ async function waitStockChartLoad(
   }
 }
 
-async function saveChartScreenshot(page: Page, stock: string): Promise<void> {
+async function saveChartScreenshot(page: Page, stock: string): Promise<string> {
   try {
     await moveMouseOutsideScreenshotView(page);
 
@@ -172,7 +182,9 @@ async function saveChartScreenshot(page: Page, stock: string): Promise<void> {
 
     const buffer = (await chartTable?.screenshot()) as Buffer;
 
-    await saveScreenshot(buffer, stock);
+    const screenshotUrl = await saveScreenshot(buffer, stock);
+
+    return screenshotUrl;
   } catch (error) {
     throw new Error(`Error taking a screenshot of the chart: ` + error);
   }
@@ -188,7 +200,7 @@ async function moveMouseOutsideScreenshotView(page: Page) {
   }
 }
 
-async function saveScreenshot(buffer: Buffer, stock: string): Promise<void> {
+async function saveScreenshot(buffer: Buffer, stock: string): Promise<string> {
   try {
     const now = new Date()
       .toLocaleDateString("pt-BR", {
@@ -201,16 +213,67 @@ async function saveScreenshot(buffer: Buffer, stock: string): Promise<void> {
       })
       .replace(/\//g, "-");
 
-    await s3
-      .putObject({
+    const s3Result = await s3
+      .upload({
         Bucket: process.env.BUCKET_NAME!,
         Key: `${stock}-${now}.png`,
         Body: buffer,
         ContentType: "image/png",
       })
       .promise();
+
+    return s3Result.Location;
   } catch (error) {
     throw new Error(`Error saving screenshot in AWS S3: ` + error);
+  }
+}
+
+async function sendMail(stockChartScreenshots: Stock[]) {
+  try {
+    const today = new Date().toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+
+    const emailText = stockChartScreenshots.reduce((accumulator, stock) => {
+      accumulator += stock.name.toUpperCase() + ": " + stock.url + "\n";
+      return accumulator;
+    }, "");
+
+    const emailHtmlContent = stockChartScreenshots.reduce(
+      (accumulator, stock) => {
+        accumulator += `<h2>${stock.name.toUpperCase()}:</h2> <img src="${
+          stock.url
+        }" alt="${stock.url}"/><br>`;
+        return accumulator;
+      },
+      ""
+    );
+
+    const emailHtml = `<html><body>${emailHtmlContent}</body></html>`;
+
+    const params: SendEmailRequest = {
+      Source: process.env.SENDER_EMAIL!,
+      Destination: { ToAddresses: [process.env.RECEIVER_EMAIL!] },
+      Message: {
+        Subject: { Data: `${today} stocks` },
+        Body: {
+          Text: {
+            Data: emailText,
+            Charset: "utf-8",
+          },
+          Html: {
+            Data: emailHtml,
+            Charset: "utf-8",
+          },
+        },
+      },
+    };
+
+    await ses.sendEmail(params).promise();
+  } catch (error) {
+    throw new Error(`Error sending email in AWS SES: ` + error);
   }
 }
 
