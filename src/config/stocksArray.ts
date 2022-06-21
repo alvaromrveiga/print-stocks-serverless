@@ -6,4 +6,4 @@ const stocks = process.env.STOCKS;
 
 const stocksWithoutSpaces = stocks?.replace(/\s/g, "");
 
-export const stocksArray = stocksWithoutSpaces.split(",");
+export const STOCKS_ARRAY = stocksWithoutSpaces.split(",");
