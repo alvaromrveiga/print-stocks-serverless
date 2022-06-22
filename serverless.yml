@@ -1,3 +1,5 @@
+org: alvaromrveiga
+app: print-stocks-serverless
 service: print-stocks-serverless
 
 frameworkVersion: "2"
@@ -46,7 +48,7 @@ resources:
           Rules:
             - Id: ExpireCharts
               Status: Enabled
-              ExpirationInDays: 7
+              ExpirationInDays: 2
     StockChartsBucketPolicy:
       Type: AWS::S3::BucketPolicy
       Properties:
