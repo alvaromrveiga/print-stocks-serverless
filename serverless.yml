@@ -2,8 +2,6 @@ org: alvaromrveiga
 app: print-stocks-serverless
 service: print-stocks-serverless
 
-frameworkVersion: "2"
-
 useDotenv: true
 
 provider:
@@ -11,7 +9,6 @@ provider:
   runtime: nodejs14.x
   region: us-east-1
   stage: ${opt:stage, 'dev'}
-  lambdaHashingVersion: "20201221"
   environment:
     STOCKS: ${env:STOCKS}
     BUCKET_NAME: ${self:custom.StockChartsBucket.name}
