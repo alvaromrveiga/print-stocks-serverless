@@ -4,7 +4,8 @@
   "description": "",
   "main": "handler.js",
   "scripts": {
-    "deploy": "tsc && sls deploy",
+    "deploy": "tsc && sls deploy --verbose",
+    "invoke": "sls invoke -f printStocks -l",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
