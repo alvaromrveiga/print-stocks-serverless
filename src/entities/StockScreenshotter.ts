@@ -12,27 +12,19 @@ export class StockScreenshotter {
     let stockChartScreenshots: Stock[] = [];
 
     for (let i = 0; i < stocks.length; i++) {
-      await this.openStockSearch(this.page);
+      await this.openStockSearch();
 
-      await this.inputStock(this.page, stocks[i]);
+      await this.inputStock(stocks[i]);
 
-      const bestStockMatch = await this.getLoadedBestStockMatch(
-        this.page,
-        stocks[i]
-      );
+      const bestStockMatch = await this.getLoadedBestStockMatch(stocks[i]);
 
-      const stockDescriptionText = await this.getBestStockMatchDescription(
-        this.page
-      );
+      const stockDescriptionText = await this.getBestStockMatchDescription();
 
       await this.clickBestStockMatch(bestStockMatch);
 
-      await this.waitStockChartLoad(this.page, stockDescriptionText);
+      await this.waitStockChartLoad(stockDescriptionText);
 
-      const screenshotUrl = await this.saveChartScreenshot(
-        this.page,
-        stocks[i]
-      );
+      const screenshotUrl = await this.saveChartScreenshot(stocks[i]);
 
       const stock = new Stock(stocks[i], screenshotUrl);
       stockChartScreenshots.push(stock);
@@ -41,9 +33,9 @@ export class StockScreenshotter {
     return stockChartScreenshots;
   }
 
-  private async openStockSearch(page: Page): Promise<void> {
+  private async openStockSearch(): Promise<void> {
     try {
-      const stockButton = await page.waitForXPath(
+      const stockButton = await this.page.waitForXPath(
         '//div[@id="header-toolbar-symbol-search"]',
         { timeout: DEFAULT_TIMEOUT }
       );
@@ -54,27 +46,26 @@ export class StockScreenshotter {
     }
   }
 
-  private async inputStock(page: Page, stock: string): Promise<void> {
+  private async inputStock(stock: string): Promise<void> {
     try {
-      const inputStock = await page.waitForXPath(
+      const inputStock = await this.page.waitForXPath(
         '//input[starts-with(@class, "search-RSKUFnp7")]',
         { timeout: DEFAULT_TIMEOUT }
       );
 
       await inputStock?.focus();
 
-      await page.keyboard.type(stock);
+      await this.page.keyboard.type(stock);
     } catch (error) {
       throw new Error(`Error inputting the stock ${stock}: ` + error);
     }
   }
 
   private async getLoadedBestStockMatch(
-    page: Page,
     stock: string
   ): Promise<ElementHandle<Element>> {
     try {
-      const stockBestMatch = await page.waitForXPath(
+      const stockBestMatch = await this.page.waitForXPath(
         `//div[starts-with(@class, "symbolTitle-uhHv1IHJ")][1]/span/em[text()="${stock}"]`,
         { timeout: DEFAULT_TIMEOUT }
       );
@@ -87,9 +78,9 @@ export class StockScreenshotter {
     }
   }
 
-  private async getBestStockMatchDescription(page: Page): Promise<string> {
+  private async getBestStockMatchDescription(): Promise<string> {
     try {
-      const stockDescription = await page.waitForXPath(
+      const stockDescription = await this.page.waitForXPath(
         `//div[starts-with(@class, "symbolDescription-uhHv1IHJ")][1]`,
         { timeout: DEFAULT_TIMEOUT }
       );
@@ -117,11 +108,10 @@ export class StockScreenshotter {
   }
 
   private async waitStockChartLoad(
-    page: Page,
     stockDescriptionText: string
   ): Promise<void> {
     try {
-      await page.waitForXPath(
+      await this.page.waitForXPath(
         `//div[starts-with(@class, "title-OYqjX7Sg mainTitle-OYqjX7Sg") and text()="${stockDescriptionText}"]`,
         { timeout: DEFAULT_TIMEOUT }
       );
@@ -130,14 +120,11 @@ export class StockScreenshotter {
     }
   }
 
-  private async saveChartScreenshot(
-    page: Page,
-    stock: string
-  ): Promise<string> {
+  private async saveChartScreenshot(stock: string): Promise<string> {
     try {
-      await this.moveMouseOutsideScreenshotView(page);
+      await this.moveMouseOutsideScreenshotView();
 
-      const chartTable = await page.waitForXPath(
+      const chartTable = await this.page.waitForXPath(
         '//table[@class="chart-markup-table"]',
         { timeout: DEFAULT_TIMEOUT }
       );
@@ -152,9 +139,9 @@ export class StockScreenshotter {
     }
   }
 
-  private async moveMouseOutsideScreenshotView(page: Page) {
+  private async moveMouseOutsideScreenshotView() {
     try {
-      await page.mouse.move(0, 0);
+      await this.page.mouse.move(0, 0);
     } catch (error) {
       throw new Error(
         `Error moving the mouse outside the screenshot view: ` + error
