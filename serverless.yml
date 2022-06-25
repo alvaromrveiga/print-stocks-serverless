@@ -2,6 +2,8 @@ org: alvaromrveiga
 app: print-stocks-serverless
 service: print-stocks-serverless
 
+frameworkVersion: "3"
+
 useDotenv: true
 
 provider:
