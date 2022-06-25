@@ -6,6 +6,7 @@
   "scripts": {
     "deploy": "tsc && sls deploy --verbose",
     "invoke": "sls invoke -f printStocks -l",
+    "invoke-local": "tsc && sls invoke local -f printStocks",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -13,6 +14,7 @@
   "license": "ISC",
   "devDependencies": {
     "puppeteer": "^13.7.0",
+    "serverless": "^3.19.0",
     "typescript": "^4.7.4"
   },
   "dependencies": {
