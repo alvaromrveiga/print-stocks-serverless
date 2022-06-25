@@ -1,7 +1,7 @@
 import { SES } from "aws-sdk";
 import { SendEmailRequest } from "aws-sdk/clients/ses";
-import { Page } from "puppeteer-core";
-import { DEFAULT_TIMEOUT, STOCKS_ARRAY, getBrowser } from "../config";
+import { getBrowser, STOCKS_ARRAY } from "../config";
+import { ChartInitializer } from "../entities/ChartInitializer";
 import { Stock } from "../entities/Stock";
 import { StockScreenshotter } from "../entities/StockScreenshotter";
 
@@ -13,11 +13,8 @@ async function printStocks() {
   const page = await browser.newPage();
   await page.goto("https://br.tradingview.com/chart/");
 
-  await waitPageLoad(page);
-
-  await changeToLogView(page);
-
-  await closeSideTab(page);
+  const chartInitializer = new ChartInitializer(page);
+  await chartInitializer.execute();
 
   const stockScreenshotter = new StockScreenshotter(page);
   const stockScreenshots = await stockScreenshotter.execute(STOCKS_ARRAY);
@@ -25,45 +22,6 @@ async function printStocks() {
   await browser.close();
 
   await sendMail(stockScreenshots);
-}
-
-async function waitPageLoad(page: Page): Promise<void> {
-  try {
-    await page.waitForXPath('//span[@class="title-ccFPqsjV"]', {
-      visible: true,
-      timeout: DEFAULT_TIMEOUT,
-    });
-  } catch (error) {
-    throw new Error("Error waiting for page to load: " + error);
-  }
-}
-
-async function changeToLogView(page: Page): Promise<void> {
-  try {
-    const logButton = await page.waitForXPath(
-      '//div[starts-with(@class, "item-sFd8og5Y button-9pA37sIi")]/div[@class="js-button-text text-9pA37sIi"]',
-      { timeout: DEFAULT_TIMEOUT }
-    );
-
-    await logButton?.click();
-  } catch (error) {
-    throw new Error("Error changing chart to Logarithmic view: " + error);
-  }
-}
-
-async function closeSideTab(page: Page): Promise<void> {
-  try {
-    const barHider = await page.waitForXPath(
-      '//div[@class="widgetbar-hider"]',
-      {
-        timeout: DEFAULT_TIMEOUT,
-      }
-    );
-
-    await barHider?.click();
-  } catch (error) {
-    throw new Error("Error closing the side tab: " + error);
-  }
 }
 
 async function sendMail(stockChartScreenshots: Stock[]) {
