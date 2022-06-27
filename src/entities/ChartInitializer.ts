@@ -76,8 +76,18 @@ export class ChartInitializer {
       );
 
       await indicatorsTab?.click();
+
+      await this.waitIndicatorTabLoad();
     } catch (error) {
       throw new Error(`Error opening the indicators tab: ` + error);
+    }
+  }
+
+  private async waitIndicatorTabLoad(): Promise<void> {
+    try {
+      await this.page.waitForXPath('//span[@class="title-eFiUyD3Z"]');
+    } catch (error) {
+      throw new Error(`Error waiting for indicator tab to load: ` + error);
     }
   }
 
@@ -91,8 +101,18 @@ export class ChartInitializer {
       await indicatorInput?.focus();
 
       await this.page.keyboard.type(indicator);
+
+      await this.waitIndicatorsLoad();
     } catch (error) {
       throw new Error(`Error inputting exponential moving average: ` + error);
+    }
+  }
+
+  private async waitIndicatorsLoad(): Promise<void> {
+    try {
+      await this.page.waitForXPath('(//h3[@class="title-7gruJzPo"])[2]');
+    } catch (error) {
+      throw new Error(`Error waiting for indicators to load: ` + error);
     }
   }
 
