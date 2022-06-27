@@ -129,6 +129,8 @@ export class StockScreenshotter {
         { timeout: DEFAULT_TIMEOUT }
       );
 
+      await this.focusOnChart(chartTable);
+
       const buffer = (await chartTable?.screenshot()) as Buffer;
 
       const screenshotUrl = await this.saveScreenshot(buffer, stock);
@@ -146,6 +148,16 @@ export class StockScreenshotter {
       throw new Error(
         `Error moving the mouse outside the screenshot view: ` + error
       );
+    }
+  }
+
+  private async focusOnChart(
+    chartTable: ElementHandle<Element> | null
+  ): Promise<void> {
+    try {
+      await chartTable?.click();
+    } catch (error) {
+      throw new Error(`Error focusing in the chart: ` + error);
     }
   }
 
