@@ -62,6 +62,7 @@
 
 ## 💻 Tecnologias
 - [Node.js](https://nodejs.org/en/) e [Typescript](https://www.typescriptlang.org/)
+- [Serverless Framework](https://www.serverless.com/) - Subir serviços para AWS
 - [Puppeteer](https://github.com/puppeteer/puppeteer) - Automatizar ações no Chromium
 - [chrome-aws-lambda](https://github.com/alixaxel/chrome-aws-lambda) - Binário do Chromium compactado para AWS Lambdas
 - [chrome-aws-lambda-layer](https://github.com/shelfio/chrome-aws-lambda-layer) - Lambda layer com o chrome-aws-lambda
